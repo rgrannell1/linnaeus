@@ -10,7 +10,22 @@ export type Media = {
   exif: Exif | undefined;
 };
 
-export interface LinnaeusOpts {
+/**
+ * Linnaeus index options
+ *
+ * @export
+ * @interface LinnaeusOpts
+ */
+export interface LinnaeusIndexOpts {
+  mediaPath: string;
+  dbPath: string;
+  extensions: {
+    photos: Set<string>;
+    videos: Set<string>;
+  };
+}
+
+export interface LinnaeusExifOpts {
   mediaPath: string;
   dbPath: string;
   extensions: {

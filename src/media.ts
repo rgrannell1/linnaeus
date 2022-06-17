@@ -4,6 +4,13 @@ import { ExifTool } from "./exiftool.ts";
 import { PROC_COUNT } from "./constants.ts";
 import { Extensions } from "./types.ts";
 
+/**
+ * Get the type of the media based on the extension
+ *
+ * @param {Extensions} extensions
+ * @param {string} name
+ * @return {*}  {string}
+ */
 function getType(extensions: Extensions, name: string): string {
   let type = "unknown";
   const ext = extname(name).toLowerCase();
@@ -19,6 +26,15 @@ function getType(extensions: Extensions, name: string): string {
   return type;
 }
 
+/**
+ * Get media and associated JSON from a photo directory
+ *
+ * @export
+ * @param {{
+ *   fpath: string;
+ *   extensions: { photos: Set<string>; videos: Set<string> };
+ * }} opts
+ */
 export async function* getMedia(opts: {
   fpath: string;
   extensions: { photos: Set<string>; videos: Set<string> };

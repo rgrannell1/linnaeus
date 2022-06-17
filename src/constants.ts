@@ -16,4 +16,5 @@ export const PROC_COUNT = 20;
 // How patient are we with exiftool?
 export const MAX_EXIFTOOL_RUNTIME = 5_000;
 
+// Sqlite database location
 export const DB_PATH = "./linnaeus.sqlite";

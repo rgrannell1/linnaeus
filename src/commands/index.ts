@@ -1,8 +1,14 @@
-import { Db } from "./db.ts";
-import * as Media from "./media.ts";
-import { LinnaeusOpts } from "./types.ts";
+import { Db } from "../db.ts";
+import * as Media from "../media.ts";
+import { LinnaeusIndexOpts } from "../types.ts";
 
-export async function linnaeusIndex(opts: LinnaeusOpts) {
+/**
+ * Index a media directory and extract exif information
+ *
+ * @export
+ * @param {LinnaeusIndexOpts} opts
+ */
+export async function linnaeusIndex(opts: LinnaeusIndexOpts) {
   let media_idx = 0;
 
   const db = new Db(opts.dbPath);
