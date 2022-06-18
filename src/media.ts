@@ -3,6 +3,7 @@ import { extname } from "https://deno.land/std@0.144.0/path/mod.ts";
 import { ExifTool } from "./exiftool.ts";
 import { PROC_COUNT } from "./constants.ts";
 import { Extensions } from "./types.ts";
+import { Db } from "./db.ts";
 
 /**
  * Get the type of the media based on the extension
@@ -36,37 +37,11 @@ function getType(extensions: Extensions, name: string): string {
  * }} opts
  */
 export async function* getMedia(opts: {
+  db: Db;
   fpath: string;
   extensions: { photos: Set<string>; videos: Set<string> };
 }) {
-  let buffer = [];
-  const { fpath, extensions } = opts;
-
-  for await (const entry of walk.walk(fpath)) {
-    if (getType(extensions, entry.name) === "unknown") {
-      continue;
-    }
-
-    buffer.push(entry);
-    if (buffer.length >= PROC_COUNT) {
-      const things = buffer.map(async (entry) => {
-        return {
-          type: getType(extensions, entry.name),
-          fpath: entry.path,
-          exif: await ExifTool.parse(entry.path),
-        };
-      });
-
-      for (const mediaInfo of await Promise.allSettled(things)) {
-        if (mediaInfo.status === "fulfilled") {
-          yield mediaInfo.value;
-        }
-      }
-
-      buffer = [];
-    }
-
-    // done
+  async function* flush(buffer: any[]) {
     const things = buffer.map(async (entry) => {
       return {
         type: getType(extensions, entry.name),
@@ -77,8 +52,30 @@ export async function* getMedia(opts: {
 
     for (const mediaInfo of await Promise.allSettled(things)) {
       if (mediaInfo.status === "fulfilled") {
-        yield mediaInfo.value;
+        yield { media: mediaInfo.value, idx };
       }
     }
   }
+
+  let idx = 0;
+  let buffer = [];
+  const { fpath, extensions, db } = opts;
+
+  for await (const entry of walk.walk(fpath)) {
+    idx++;
+
+    if (db.hasEntry(fpath) || getType(extensions, entry.name) === "unknown") {
+      continue;
+    }
+
+    buffer.push(entry);
+
+    if (buffer.length >= PROC_COUNT) {
+      yield* flush(buffer);
+      buffer = [];
+    }
+  }
+
+  yield* flush(buffer);
+  buffer = [];
 }

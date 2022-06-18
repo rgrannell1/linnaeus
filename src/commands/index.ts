@@ -9,13 +9,12 @@ import { LinnaeusIndexOpts } from "../types.ts";
  * @param {LinnaeusIndexOpts} opts
  */
 export async function linnaeusIndex(opts: LinnaeusIndexOpts) {
-  let media_idx = 0;
-
   const db = new Db(opts.dbPath);
   await db.createTables();
 
   for await (
-    const media of Media.getMedia({
+    const { media, idx } of Media.getMedia({
+      db,
       fpath: opts.mediaPath,
       extensions: opts.extensions,
     })
@@ -23,7 +22,7 @@ export async function linnaeusIndex(opts: LinnaeusIndexOpts) {
     console.clear();
     const emoji = media.type === "photo" ? "📷" : "📹";
 
-    const message = `${emoji} Stored media-item #${media_idx++}`.padEnd(40);
+    const message = `${emoji} Stored media-item #${idx}`.padEnd(40);
     console.log(`Linnaeus\n`);
     console.log(`${message}${media.fpath}`);
     await db.writeMedia(media);

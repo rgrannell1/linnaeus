@@ -41,14 +41,26 @@ export class Db {
     return Promise.all(tables.map((table) => this.db.execute(table)));
   }
 
+  hasEntry(fpath: string) {
+    for (
+      const _ of this.db.query("select fpath from media where fpath = :fpath", {
+        fpath,
+      })
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
   /**
    * Write media to the database
    *
    * @param {Media} media
    * @memberof Db
    */
-  async writeMedia(media: Media) {
-    await this.db.query(
+  writeMedia(media: Media) {
+    this.db.query(
       `insert or replace into media (fpath, exif) values (:fpath, :exif)`,
       {
         fpath: media.fpath,
@@ -57,13 +69,15 @@ export class Db {
     );
   }
 
-  async* getExif() {
-    for (const [fpath, exif] of await this.db.query('select fpath, exif from media')) {
-      if ((exif as string).startsWith('[')) {
+  *getExif() {
+    for (
+      const [fpath, exif] of this.db.query("select fpath, exif from media")
+    ) {
+      if ((exif as string).startsWith("[")) {
         yield {
           fpath,
-          exif: JSON.parse(exif as string)[0]
-        }
+          exif: JSON.parse(exif as string)[0],
+        };
       }
     }
   }

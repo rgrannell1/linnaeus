@@ -20,7 +20,7 @@ const args = docopt(LINNAEUS_CLI);
 
 const commands: Record<string, any> = {
   index: linnaeusIndex,
-  exif: linnaeusExif
+  exif: linnaeusExif,
 };
 
 const [command] = Deno.args;
@@ -32,7 +32,7 @@ if (commands.hasOwnProperty(command)) {
     extensions: {
       videos: VIDEOS,
       photos: PHOTOS,
-    }
+    },
   });
 } else {
   console.log(LINNAEUS_CLI);

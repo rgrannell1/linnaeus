@@ -1,5 +1,5 @@
 import { Db } from "../db.ts";
-import { LinnaeusExifOpts } from '../types.ts'
+import { LinnaeusExifOpts } from "../types.ts";
 
 export async function linnaeusExif(opts: LinnaeusExifOpts) {
   const db = new Db(opts.dbPath);
